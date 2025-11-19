@@ -316,7 +316,7 @@ const DashboardScreen = ({ navigation, route }) => {
       <Tab.Navigator
         screenOptions={{
           tabBarShowLabel: true,
-          tabBarStyle: { height: 60 },
+          tabBarStyle: { height: 60, paddingBottom: 5, paddingTop: 5,},
           headerShown: false,
         }}
       >
