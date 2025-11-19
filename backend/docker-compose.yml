@@ -1,0 +1,47 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: personality_analysis_app
+    ports:
+      - "11444:11441"
+    volumes:
+      - .:/app
+#    depends_on:
+#      - db
+    environment:
+#      - DATABASE_URL=postgresql://postgres:postgres@db:5432/personality_analysis
+      - TZ=Canada/Atlantic
+      - DATABASE_URL=postgresql://mindful-eating_owner:npg_Ka9e8SEtJLsR@ep-mute-bird-a4kpmqot-pooler.us-east-1.aws.neon.tech/mindful-eating?sslmode=require
+      - SECRET_KEY=f2f8d8e39550306348b301a93dc423b26077d84f3675409e47ebe1cfe9c2d5711b875371b68596ab9175f16b6ec08abbbe7acb7df98d7e9d5c2ba2edbf0f688296691c64deef9544bf92af2e77f94eeca37b9b125b0b55f16a0301243788e12ffc4353fe697dd5a87cb35766e823f17d36267e96e88eeb151e11c051961533cda6b280d3a526715ab29c0db52b03ae15441a5078d0c204ad3c5808e3484f58e61bb7f34d7876063abeb05b9d468e20ad85fc9b4d57be1fe4c5f7eb0877eefe4a8a34f071f85a91f4ebb93031c14a29645578255698bc3e9f34aba31fa9fc72d8a1cec376d06709d753f51501434d7ab596e12980bb1b74e135549c7e69427314
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    # command: "sh -c 'while true; do ping host.docker.internal; sleep 5; done'"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # networks:
+    #   sam-network:
+
+#  db:
+#    image: postgres:15
+#    container_name: personality_analysis_db
+#    restart: always
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: personality_analysis
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#    networks:
+#      sam-network:
+#
+#volumes:
+#  postgres_data:
+
+# networks:
+#   sam-network:

@@ -1,0 +1,36 @@
+# React Native
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build directories
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/Podfile.lock
+ios/build/
+
+# VSCode settings
+.vscode/
+
+# MacOS Finder directory attributes
+.DS_Store
+
+# Expo files (if using Expo)
+.expo/
+
+# Watchman and Metro bundler caches
+.watchmanconfig
+metro-bundler-cache-*/
+
+# Temporary files created by Jest
+coverage/
+*.log
+
+# Native IDE/Editor project files
+*.iml
+.idea/
+
+# Android Studio and IntelliJ IDEA related files
+*.apk
+*.aab

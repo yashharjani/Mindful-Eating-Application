@@ -1,0 +1,39 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Virtual environment
+venv/
+.venv/
+
+# Git
+.git/
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+
+# Logs
+*.log
+logs/
+
+# Test and temp files
+*.tmp
+*.swp
+*.bak
+*.orig
+.coverage
+pytest_cache/
+
+# IDE config files
+.idea/
+.vscode/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db

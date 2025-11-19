@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment directory
+fastapi_env/
+
+# Environment variables
+.env
+
+# Virtual environment
+venv/
+.venv/
+
+# SQLite database files
+*.sqlite3
+*.db
+
+# Logs
+*.log
+
+# Test output
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# IDE / Editor folders
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# System files
+.DS_Store
+Thumbs.db
+
+Images
+.venv
+.ruff_cache
+
+README.md

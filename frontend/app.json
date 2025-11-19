@@ -1,0 +1,74 @@
+{
+  "expo": {
+    "name": "MindfulEating",
+    "slug": "MindfulEating",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon-custom.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon-custom.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile pictures.",
+        "NSCameraUsageDescription": "This app needs access to your camera to take profile pictures.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "bundleIdentifier": "com.samshad.mindfuleating"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-custom.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "CAMERA",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "package": "com.samshad.mindfuleating",
+      "allowInsecureHttpRequests": true,
+      "versionCode": 1,
+      "networkSecurityConfig": "./assets/network_security_config.xml",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "http",
+              "host": "*"
+            },
+            {
+              "scheme": "https",
+              "host": "*"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+      "minifyEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/icon-custom.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f40113b3-f7fd-449e-aa7f-c2e7239cf48e"
+      }
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
