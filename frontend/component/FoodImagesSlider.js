@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
+import { ScrollView } from "react-native";
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator, FlatList, Modal } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -51,7 +52,7 @@ const FoodImagesSlider = () => {
   const fetchFoodUpdateDetails = async (foodUpdateId) => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await axios.get(`${BASE_URL}/food-update/food-update/${foodUpdateId}`, {
+      const response = await axios.get(`${BASE_URL}/food-update/${foodUpdateId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -185,14 +186,23 @@ const FoodImagesSlider = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
+            <ScrollView showsVerticalScrollIndicator={false}>
             {foodUpdateDetails && (
               <>
-                <Text style={styles.modalTitle}>Food Journey Description</Text>
-                <Text style={styles.modalDescription}>{foodUpdateDetails.description}</Text>
-                {/* Display the created_at timestamp */}
-                <Text style={styles.createdAtText}>
-                  Food Journey Date: {new Date(foodUpdateDetails.created_at).toLocaleString()}
+                {/* Title */}
+                <Text style={styles.modalTitle}>Food Journey Details</Text>
+
+                {/* Description */}
+                <Text style={styles.modalDescription}>
+                  {foodUpdateDetails.description}
                 </Text>
+
+                {/* Created At */}
+                <Text style={styles.createdAtText}>
+                  Date: {new Date(foodUpdateDetails.created_at).toLocaleString()}
+                </Text>
+
+                {/* Images */}
                 <FlatList
                   data={foodUpdateDetails.images}
                   renderItem={({ item }) => (
@@ -207,14 +217,65 @@ const FoodImagesSlider = () => {
                   pagingEnabled
                   showsHorizontalScrollIndicator={false}
                 />
-                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+
+                {/*AI Analysis*/}
+                {foodUpdateDetails.analysis && (
+                  <View style={{ marginTop: 20 }}>
+                    <Text style={styles.analysisTitle}>Food Analysis</Text>
+
+                    <Text style={styles.analysisLabel}>Identified Food:</Text>
+                    <Text style={styles.analysisValue}>
+                      {foodUpdateDetails.analysis.food_identified}
+                    </Text>
+
+                    <Text style={styles.analysisLabel}>Healthy?</Text>
+                    <Text
+                      style={[
+                        styles.analysisValue,
+                        {
+                          color: foodUpdateDetails.analysis.is_healthy ? "green" : "red",
+                          fontWeight: "bold",
+                        },
+                      ]}
+                    >
+                      {foodUpdateDetails.analysis.is_healthy ? "Yes" : "No"}
+                    </Text>
+
+                    <Text style={styles.analysisLabel}>Goal Alignment:</Text>
+                    <Text style={styles.analysisValue}>
+                      {foodUpdateDetails.analysis.goal_alignment}
+                    </Text>
+
+                    <Text style={styles.analysisLabel}>Personalized Advice:</Text>
+                    <Text style={styles.analysisValue}>
+                      {foodUpdateDetails.analysis.personalized_advice}
+                    </Text>
+
+                    {foodUpdateDetails.analysis.correction ? (
+                      <>
+                        <Text style={styles.analysisLabel}>Correction:</Text>
+                        <Text style={styles.analysisValue}>
+                          {foodUpdateDetails.analysis.correction}
+                        </Text>
+                      </>
+                    ) : null}
+                  </View>
+                )}
+
+                {/* Close Button */}
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setModalVisible(false)}
+                >
                   <Text style={styles.closeButtonText}>Close</Text>
                 </TouchableOpacity>
               </>
             )}
+            </ScrollView>
           </View>
         </View>
       </Modal>
+
     </GestureHandlerRootView>
   );
 };
@@ -324,6 +385,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '90%',
+    height:'75%',
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 20,
@@ -371,6 +433,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  analysisTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    marginTop: 15,
+    marginBottom: 10,
+  },
+
+  analysisLabel: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 10,
+    fontWeight: "bold",
+  },
+
+  analysisValue: {
+    fontSize: 14,
+    color: "#333",
+    marginTop: 4,
+    lineHeight: 20,
   },
 });
 

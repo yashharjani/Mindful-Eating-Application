@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ScrollView } from "react-native";
 import {
   View,
   Text,
@@ -25,6 +26,8 @@ const FoodUpdateScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [foodDetailsModalVisible, setFoodDetailsModalVisible] = useState(false);
+  const [selectedFoodUpdateDetails, setSelectedFoodUpdateDetails] = useState(null);
 
   // Fetch user's food updates on component mount
   useEffect(() => {
@@ -136,7 +139,25 @@ const FoodUpdateScreen = () => {
 
   // Render each food update item
   const renderFoodUpdate = ({ item }) => (
-    <View style={styles.foodUpdateItem}>
+    // <View style={styles.foodUpdateItem}>
+    <TouchableOpacity
+      style={styles.foodUpdateItem}
+      onPress={() => fetchFoodUpdateDetails(item.id)}
+    >
+      {item.analysis && (
+        <View
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: 8,
+            backgroundColor: item.analysis.is_healthy ? "green" : "red",
+            position: "absolute",
+            top: 10,
+            right: 10,
+          }}
+        />
+      )}
+
       <Text style={styles.description}>{item.description}</Text>
       <Text style={styles.date}>{new Date(item.created_at).toLocaleString()}</Text>
       <View style={styles.imageContainer}>
@@ -144,16 +165,44 @@ const FoodUpdateScreen = () => {
           <TouchableOpacity
             key={index}
             onPress={() => {
-              setSelectedImage(`data:image/png;base64,${image}`);
+              setSelectedImage(image);
               setImageModalVisible(true);
             }}
           >
-            <Image source={{ uri: `data:image/png;base64,${image}` }} style={styles.image} />
+            <Image source={{ uri: image }} style={styles.image} />
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+    {/* </View> */}
+    </TouchableOpacity>
   );
+
+  const fetchFoodUpdateDetails = async (foodUpdateId) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/food-update/${foodUpdateId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.data) {
+        setSelectedFoodUpdateDetails(response.data.data);
+        setFoodDetailsModalVisible(true);
+      }
+    } catch (err) {
+      console.error("Error fetching food update details:", err);
+      Toast.show({
+        type: "error",
+        text1: "Something Went Wrong!",
+        text2: "Unable to load food details.",
+      });
+    }
+  };
+
+  const removeImage = (indexToRemove) => {
+    setImages((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
 
   return (
     <View style={styles.container}>
@@ -196,9 +245,28 @@ const FoodUpdateScreen = () => {
             </TouchableOpacity>
 
             {/* Display Selected Images */}
-            <View style={styles.selectedImagesContainer}>
+            {/* <View style={styles.selectedImagesContainer}>
               {images.map((image, index) => (
                 <Image key={index} source={{ uri: `data:image/png;base64,${image}` }} style={styles.selectedImage} />
+              ))}
+            </View> */}
+
+            <View style={styles.selectedImagesContainer}>
+              {images.map((image, index) => (
+                <View key={index} style={styles.imageWrapper}>
+                  <Image
+                    source={{ uri: `data:image/png;base64,${image}` }}
+                    style={styles.selectedImage}
+                  />
+
+                  {/* Delete (X) button */}
+                  <TouchableOpacity
+                    style={styles.deleteIconContainer}
+                    onPress={() => removeImage(index)}
+                  >
+                    <Text style={styles.deleteIcon}>✕</Text>
+                  </TouchableOpacity>
+                </View>
               ))}
             </View>
 
@@ -227,6 +295,107 @@ const FoodUpdateScreen = () => {
           <Image source={{ uri: selectedImage }} style={styles.fullImage} resizeMode="contain" />
         </View>
       </Modal>
+    
+
+    {/* FOOD DETAILS + AI ANALYSIS MODAL */}
+      <Modal
+        visible={foodDetailsModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setFoodDetailsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.dashboardModalContainer}> 
+            <ScrollView showsVerticalScrollIndicator={false}>
+
+              {selectedFoodUpdateDetails && (
+                <>
+                  {/* Title */}
+                  <Text style={styles.modalTitle}>Food Journey Details</Text>
+
+                  {/* Description */}
+                  <Text style={styles.modalDescription}>
+                    {selectedFoodUpdateDetails.description}
+                  </Text>
+
+                  {/* Created At */}
+                  <Text style={styles.createdAtText}>
+                    Date: {new Date(selectedFoodUpdateDetails.created_at).toLocaleString()}
+                  </Text>
+
+                  {/* Images */}
+                  <FlatList
+                    data={selectedFoodUpdateDetails.images}
+                    renderItem={({ item }) => (
+                      <Image
+                        source={{ uri: item.base64_image }}
+                        style={styles.modalImage}
+                        resizeMode="cover"
+                      />
+                    )}
+                    keyExtractor={item => item.id.toString()}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                  />
+
+                  {/* AI FOOD ANALYSIS */}
+                  {selectedFoodUpdateDetails.analysis && (
+                    <View style={{ marginTop: 20 }}>
+                      <Text style={styles.analysisTitle}>Food Analysis</Text>
+
+                      <Text style={styles.analysisLabel}>Identified Food:</Text>
+                      <Text style={styles.analysisValue}>
+                        {selectedFoodUpdateDetails.analysis.food_identified}
+                      </Text>
+
+                      <Text style={styles.analysisLabel}>Healthy?</Text>
+                      <Text
+                        style={[
+                          styles.analysisValue,
+                          {
+                            color: selectedFoodUpdateDetails.analysis.is_healthy ? "green" : "red",
+                            fontWeight: "bold",
+                          },
+                        ]}
+                      >
+                        {selectedFoodUpdateDetails.analysis.is_healthy ? "Yes" : "No"}
+                      </Text>
+
+                      <Text style={styles.analysisLabel}>Goal Alignment:</Text>
+                      <Text style={styles.analysisValue}>
+                        {selectedFoodUpdateDetails.analysis.goal_alignment}
+                      </Text>
+
+                      <Text style={styles.analysisLabel}>Personalized Advice:</Text>
+                      <Text style={styles.analysisValue}>
+                        {selectedFoodUpdateDetails.analysis.personalized_advice}
+                      </Text>
+
+                      {selectedFoodUpdateDetails.analysis.correction ? (
+                        <>
+                          <Text style={styles.analysisLabel}>Correction:</Text>
+                          <Text style={styles.analysisValue}>
+                            {selectedFoodUpdateDetails.analysis.correction}
+                          </Text>
+                        </>
+                      ) : null}
+                    </View>
+                  )}
+
+                  {/* Close Button */}
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setFoodDetailsModalVisible(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -239,12 +408,43 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f8f9fa',
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  dashboardModalContainer: {
+    width: '90%',
+    height: '75%',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalDescription: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  createdAtText: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
   addButton: {
     backgroundColor: '#3498db',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 25,
-    width: '50%',
+    width: '60%',
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: 16,
@@ -409,18 +609,65 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   closeButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 10,
-    elevation: 5,
+    backgroundColor: '#3498db',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 20,
+    alignSelf: 'center',
   },
   closeButtonText: {
-    fontSize: 18,
+    color: '#fff',
     fontWeight: 'bold',
-    color: '#000',
+    fontSize: 16,
+  },
+  analysisTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+
+  analysisLabel: {
+    fontSize: 15,
+    marginTop: 10,
+    fontWeight: "bold",
+    color: "#555",
+  },
+
+  analysisValue: {
+    fontSize: 15,
+    marginTop: 4,
+    color: "#333",
+    lineHeight: 20,
+  },
+  modalImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 8,
+    marginBottom: 8,
+  },
+
+  deleteIconContainer: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: 12,
+    padding: 3,
+    zIndex: 10,
+  },
+
+  deleteIcon: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

@@ -1,0 +1,863 @@
+{
+	"info": {
+		"_postman_id": "fea90926-844e-4aa9-bd6a-6bbe18a0b8a7",
+		"name": "Mindful Eating",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6016759"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Registration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"samshad@dal.ca\",\n    \"password\": \"123456\",\n    \"first_name\": \"samshad\",\n    \"last_name\": \"rahman\"\n    // \"address\": \"Mohammadpur\",\n    // \"mobile_number\": \"01685931044\",\n    // \"admin_secret_key\": \"personality-analysis-admin\",\n    // \"country\": \"Bangladesh\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"if (response.data && response.data.access_token) {",
+									"    pm.environment.set(\"access_token\", response.data.access_token);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"samshad@dal.ca\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forget password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testing@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forget-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"forget-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testing@gmail.com\",\n    \"otp\": \"782863\",\n    \"new_password\": \"87654321\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/password-reset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"password-reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Profile Picture",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"base64_file\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/upload-profile-picture",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"upload-profile-picture"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get profile picture",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1efe600f-bba3-4e10-a237-d37bac18889b"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/profile-picture",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile-picture"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Md Samshad\",\n    \"last_name\": \"Rahman\",\n    \"country\": \"Canada\",\n    \"state\": \"\",\n    \"city\": \"\",\n    \"dob\": \"1999-09-22\",\n    \"age\": \"26\",\n    \"gender\": \"Male\",\n    \"occupation\": \"Student\",\n    \"lifestyle_type\": \"Active\",\n    \"cultural_religious_dietary_influence\": \"Halal\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/update-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"update-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile Details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/profile-details",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile-details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Food Update",
+			"item": [
+				{
+					"name": "Get food update List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1efe600f-bba3-4e10-a237-d37bac18889b"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/food-update/user-food-updates",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"food-update",
+								"user-food-updates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get food update by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1efe600f-bba3-4e10-a237-d37bac18889b"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/food-update/food-update/12",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"food-update",
+								"food-update",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all food update images",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1efe600f-bba3-4e10-a237-d37bac18889b"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/food-update/user-uploaded-images",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"food-update",
+								"user-uploaded-images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post food update",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Test Food Update 3.\",\n  \"images\": [\n    {\n      \"base64_file\": \"iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAd0lEQVR4nOzQMQ2AQBQEUSBowAqhQggCsIEozJBg4dqrT8MkW/xiRsDmZdf3uaZQZ99TU0tqKJsskiySLJIskiySLJIskiySLJIskixSUda8tS+19d9HaqroW7JIskiySLJIskiySLJIskiySLJIskhFWSMAAP//gPwGuR98QqYAAAAASUVORK5CYII=\"\n    },\n    {\n      \"base64_file\": \"iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAd0lEQVR4nOzQMQ2AUBAEUULOFTqwATqQgwwkUOKAhIbya5hkiytmBGxetp57n0It25WamlND2WSRZJFkkWSRZJFkkWSRZJFkkWSRZJGasmr939TWd5ypqaZvySLJIskiySLJIskiySLJIskiySLJIjVljQAAAP//rK4Ibl+n41kAAAAASUVORK5CYII=\"\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/food-update/food-update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"food-update",
+								"food-update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Question",
+			"item": [
+				{
+					"name": "Answer Submit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"answer_list\": [\n    {\n      \"question_id\": 1,\n      \"answer\": \"New foods\"\n    },\n    {\n      \"question_id\": 2,\n      \"answer\": \"Sometimes\"\n    },\n    {\n      \"question_id\": 3,\n      \"answer\": \"Vegetarian\"\n    },\n    {\n      \"question_id\": 4,\n      \"answer\": [\"Lactose Intolerance\", \"Gluten Sensitivity\"]\n    },\n    {\n      \"question_id\": 5,\n      \"answer\": \"3\"\n    },\n    {\n      \"question_id\": 6,\n      \"answer\": \"Italian, Mexican, Japanese\"\n    },\n    {\n      \"question_id\": 7,\n      \"answer\": \"I avoid seafood.\"\n    },\n    {\n      \"question_id\": 8,\n      \"answer\": \"Fixed schedule\"\n    },\n    {\n      \"question_id\": 9,\n      \"answer\": {\n        \"selected_option\": \"Daily\",\n        \"text\": \"I prefer fruits and nuts.\"\n      }\n    },\n    {\n      \"question_id\": 10,\n      \"answer\": \"70\"\n    },\n    {\n      \"question_id\": 11,\n      \"answer\": \"Weekly\"\n    },\n    {\n      \"question_id\": 12,\n      \"answer\": {\n        \"selected_option\": \"Weekly\",\n        \"checkboxes\": [\"Plan meals before shopping\"]\n      }\n    },\n    {\n      \"question_id\": 13,\n      \"answer\": \"Enjoy social dining\"\n    },\n    {\n      \"question_id\": 14,\n      \"answer\": \"Neutral\"\n    },\n    {\n      \"question_id\": 15,\n      \"answer\": \"Sometimes\"\n    },\n    {\n      \"question_id\": 16,\n      \"answer\": \"Sometimes\"\n    },\n    {\n      \"question_id\": 17,\n      \"answer\": \"Moderately\"\n    },\n    {\n      \"question_id\": 18,\n      \"answer\": \"Sometimes\"\n    },\n    {\n      \"question_id\": 19,\n      \"answer\": \"Often\"\n    },\n    {\n      \"question_id\": 20,\n      \"answer\": [\"None\"]\n    },\n    {\n      \"question_id\": 21,\n      \"answer\": \"Maintain\"\n    },\n    {\n      \"question_id\": 22,\n      \"answer\": \"Moderately Active\"\n    },\n    {\n      \"question_id\": 23,\n      \"answer\": \"2\"\n    },\n    {\n      \"question_id\": 24,\n      \"answer\": [\"Vitamins\", \"Omega-3\"]\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/question/submit-answers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"question",
+								"submit-answers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check Submission",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"answer_list\": [\n        {\n            \"question_id\": 1,\n            \"answer\": \"Weekly\"\n        },\n        {\n            \"question_id\": 2,\n            \"answer\": \"Italian\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/question/check-submission",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"question",
+								"check-submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get answers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"answer_list\": [\n        {\n            \"question_id\": 1,\n            \"answer\": \"Weekly\"\n        },\n        {\n            \"question_id\": 2,\n            \"answer\": \"Italian\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/question/get-answers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"question",
+								"get-answers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Question List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/question/question-list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"question",
+								"question-list"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Behavior",
+			"item": [
+				{
+					"name": "Submit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"behavior_list\": [\n    {\n      \"behavior_id\": 1,\n      \"first_priority\": true,\n      \"high_priority\": false\n    },\n    {\n      \"behavior_id\": 2,\n      \"first_priority\": false,\n      \"high_priority\": true\n    },\n    {\n      \"behavior_id\": 3,\n      \"first_priority\": false,\n      \"high_priority\": false\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/behavior/submit-behavior",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"behavior",
+								"submit-behavior"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check Submission",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/behavior/check-behavior-submission",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"behavior",
+								"check-behavior-submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get behavior List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/behavior/behavior-list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"behavior",
+								"behavior-list"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Goal",
+			"item": [
+				{
+					"name": "Submit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"goal_text\": \"Test User Goal\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/goal/submit-user-goal",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"goal",
+								"submit-user-goal"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user goal",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/goal/get-user-goal",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"goal",
+								"get-user-goal"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tips",
+			"item": [
+				{
+					"name": "Submit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tips_text\": \"{'Eating Behavior': 'Balanced Food Choices', 'Dominant Big5': 'Agreeableness'}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/tips/submit-user-tips",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tips",
+								"submit-user-tips"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user tips",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//     \"message\": \"User goal retrieved successfully\",\n//     \"data\": {\n//         \"goal_text\": \"Test User Goal - today\",\n//         \"created_at\": \"2025-03-15T15:45:48.738273\"\n//     }\n// }\n\n// {\n//     \"message\": \"No goal set for today\",\n//     \"data\": null\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/tips/get-user-tips",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tips",
+								"get-user-tips"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

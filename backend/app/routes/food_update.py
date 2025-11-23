@@ -18,7 +18,7 @@ router = APIRouter()
 def post_food_update(
     food_update: FoodUpdatePayload,  # Expecting description and base64 images
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  # Get the authenticated user
+    current_user: User = Depends(get_current_user),
 ):
     try:
         return post_food_update_controller(current_user, food_update, db)
@@ -29,7 +29,7 @@ def post_food_update(
 @router.get("/user-food-updates", response_model=dict)
 def get_user_food_updates(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),  # Get the authenticated user
+    current_user: User = Depends(get_current_user),
 ):
     try:
         return get_user_food_updates_controller(current_user, db)
@@ -47,7 +47,7 @@ def get_user_uploaded_images(
         raise e
 
 
-@router.get("/food-update/{food_update_id}", response_model=dict)
+@router.get("/{food_update_id}", response_model=dict)
 def get_food_update_images(
     food_update_id: int = Path(..., description="The ID of the food update post"),
     db: Session = Depends(get_db),

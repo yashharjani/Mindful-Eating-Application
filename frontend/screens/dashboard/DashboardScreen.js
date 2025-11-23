@@ -90,31 +90,6 @@ const DashboardScreen = ({ navigation, route }) => {
     fetchUserData();
   }, []);
 
-  // const fetchUserData = async () => {
-  //   try {
-  //     const token = await AsyncStorage.getItem('token');
-  //     if (token) {
-  //       const user = JSON.parse(atob(token.split('.')[1]));
-  //       setUserName(`${user.first_name} ${user.last_name}`);
-  //       setUserUserName(`${user.username}`);
-  //       const response = await axios.get(`${BASE_URL}/auth/profile-picture`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       if (response.status === 200) {
-  //         setProfilePicture(`data:image/png;base64,${response.data.data.profile_picture}`);
-  //       } else {
-  //         setProfilePicture(null);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.log("Error fetching user data:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const fetchUserData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -331,7 +306,7 @@ const DashboardScreen = ({ navigation, route }) => {
           }}
         />
         <Tab.Screen
-          name="FoodUpdate"
+          name="Food Update"
           component={FoodUpdateScreen}
           options={{
             tabBarIcon: ({ color, size }) => (

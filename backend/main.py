@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import logging
 
+from app.database import engine
+from app import models
+models.Base.metadata.create_all(bind=engine)
+
 # Routes
 from app.routes import user, question, food_update, behavior, goal, tips, big_five
 
