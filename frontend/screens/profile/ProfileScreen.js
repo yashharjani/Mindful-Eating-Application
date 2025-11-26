@@ -15,6 +15,7 @@ import axios from 'axios';
 import BASE_URL from '../../utils/config';
 import Toast from 'react-native-toast-message';
 import { useFocusEffect } from '@react-navigation/native';
+import { Alert } from "react-native";
 
 const ProfileViewScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
@@ -196,6 +197,23 @@ const ProfileViewScreen = ({ navigation, route }) => {
     );
   }
 
+  const confirmLogout = () => {
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          onPress: async () => {
+            await AsyncStorage.removeItem("token");
+            navigation.replace("Login");
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Profile Picture */}
@@ -312,6 +330,12 @@ const ProfileViewScreen = ({ navigation, route }) => {
         }
       >
         <Text style={styles.editButtonText}>Edit Profile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={confirmLogout}
+      >
+        <Text style={styles.logoutButtonText}>Log Out</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -449,6 +473,20 @@ const styles = StyleSheet.create({
     color: '#3498db',
     marginBottom: 15,
     fontWeight: '500',
+  },
+  logoutButton: {
+    backgroundColor: '#e74c3c',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+
+  logoutButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

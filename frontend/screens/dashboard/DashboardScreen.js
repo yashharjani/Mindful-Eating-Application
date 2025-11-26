@@ -257,18 +257,18 @@ const DashboardScreen = ({ navigation, route }) => {
               <Text style={styles.uploadText}>Upload Profile Image</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             ref={dropdownRef}
             onPress={toggleDropdown}
             style={styles.dropdownIcon}
           >
             <Ionicons name="ellipsis-vertical" size={24} color="#3498db" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
       
       {/* Dropdown Menu */}
-      {dropdownVisible && (
+      {/* {dropdownVisible && (
         <View
           style={[
             styles.dropdownMenu,
@@ -285,7 +285,7 @@ const DashboardScreen = ({ navigation, route }) => {
             <Text style={styles.dropdownText}>Log Out</Text>
           </TouchableOpacity>
         </View>
-      )}
+      )} */}
       
       {/* Bottom Tab Navigator */}
       <Tab.Navigator
