@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -6,210 +6,201 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   ActivityIndicator,
-  Alert,
   SafeAreaView,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import BASE_URL from '../../utils/config';
+  Platform
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import BASE_URL from "../../utils/config";
 
-// Mock data for initial development
-const MOCK_INITIAL_MESSAGES = [
-  {
-    id: '1',
-    text: 'Hello! How can I help you with your nutrition today?',
-    sender: 'assistant',
-    timestamp: new Date(Date.now() - 60000 * 30).toISOString(), // 30 mins ago
-  },
-];
+const DEFAULT_WELCOME_MESSAGE = {
+  id: "welcome-1",
+  text: "Hi, how can I help you today?",
+  sender: "assistant",
+  timestamp: new Date().toISOString(),
+};
 
-const ChatScreen = ({ navigation, route }) => {
+const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
   const flatListRef = useRef(null);
-
-  // Simulated polling interval (in ms) - would be replaced with real-time solution
-  const POLLING_INTERVAL = 3000;
-
-  useEffect(() => {
-    const loadUserAndChat = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-          const user = JSON.parse(atob(token.split('.')[1]));
-          setUserId(user.id);
-          
-          // Check if we have a session ID from navigation params
-          const activeSessionId = route.params?.sessionId;
-          
-          if (activeSessionId) {
-            setSessionId(activeSessionId);
-            await fetchSessionMessages(activeSessionId);
-          } else {
-            // Create a new session or get the most recent one
-            await createOrGetSession(user.id);
-          }
-        }
-      } catch (error) {
-        console.log("Error loading user data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadUserAndChat();
-    
-    // Set up polling for new messages (simulating real-time)
-    const interval = setInterval(() => {
-      if (sessionId) {
-        fetchSessionMessages(sessionId, true);
-      }
-    }, POLLING_INTERVAL);
-    
-    return () => clearInterval(interval);
-  }, [sessionId, route.params?.sessionId]);
-
-  const createOrGetSession = async (userId) => {
-    // In a real implementation, you would either create a new session
-    // or load the most recent active one
-    
-    // For now, we'll just use mock data and a fake session ID
-    setSessionId('mock-session-1');
-    setMessages(MOCK_INITIAL_MESSAGES);
-    
-    /* Real implementation would look something like:
-    try {
-      const token = await AsyncStorage.getItem('token');
-      // Try to get the most recent active session
-      const response = await axios.get(
-        `${BASE_URL}/chat/sessions?active_only=true&limit=1`, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      if (response.data && response.data.length > 0) {
-        // Use existing session
-        const session = response.data[0];
-        setSessionId(session.id);
-        fetchSessionMessages(session.id);
-      } else {
-        // Create new session
-        const newSessionResponse = await axios.post(
-          `${BASE_URL}/chat/sessions`,
-          { title: "New Chat" },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setSessionId(newSessionResponse.data.id);
-        setMessages([]);
-      }
-    } catch (error) {
-      console.log("Error creating/getting session:", error);
-    }
-    */
-  };
-
-  const fetchSessionMessages = async (sid, silent = false) => {
-    if (!silent) {
-      setIsLoading(true);
-    }
-    
-    try {
-      // In a real implementation, you would fetch from your API
-      // For now, we'll use mock data
-      if (!silent) {
-        setMessages(MOCK_INITIAL_MESSAGES);
-      }
-      
-      /* Real implementation would look something like:
-      const token = await AsyncStorage.getItem('token');
-      const response = await axios.get(`${BASE_URL}/chat/sessions/${sid}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessages(response.data.messages.map(msg => ({
-        id: msg.id.toString(),
-        text: msg.content,
-        sender: msg.sender,
-        timestamp: msg.created_at
-      })));
-      */
-    } catch (error) {
-      console.log("Error fetching messages:", error);
-    } finally {
-      if (!silent) {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const sendMessage = async () => {
-    if (!inputText.trim()) return;
-  
-    const newMessage = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: 'user',
-      timestamp: new Date().toISOString(),
-    };
-  
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    setInputText('');
-  
-    setTimeout(() => {
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-  
-    try {
-      setIsTyping(true);
-  
-      const response = await axios.post(`${BASE_URL}/auth/chat`, {
-        prompt: inputText,
-      });
-  
-      const assistantMessage = {
-        id: Date.now().toString(),
-        text: response.data.response,
-        sender: 'assistant',
-        timestamp: new Date().toISOString(),
-      };
-  
-      setMessages(prevMessages => [...prevMessages, assistantMessage]);
-      setIsTyping(false);
-  
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    } catch (error) {
-      console.log("Error sending message:", error);
-      setIsTyping(false);
-      Alert.alert("Error", "Failed to get a response from the assistant.");
-    }
-  };
+  const POLL_INTERVAL = 2500;
 
   const formatTime = (timestamp) => {
+    if (!timestamp) return "";
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Load Latest Session on Mount
+  useEffect(() => {
+    loadLatestSession();
+
+    const interval = setInterval(async () => {
+      if (sessionId) {
+        const msgs = await loadMessages(sessionId, true);
+        if (msgs.length > 0) {
+          setMessages(msgs);
+        }
+      }
+    }, POLL_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Load Latest Session
+  const loadLatestSession = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await axios.get(`${BASE_URL}/chat/sessions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.length > 0) {
+        const latest = response.data[0];
+        setSessionId(latest.id);
+
+        const msgs = await loadMessages(latest.id, true);
+
+        if (!initialized) {
+          if (msgs.length === 0) {
+            setMessages([DEFAULT_WELCOME_MESSAGE]);
+          } else {
+            setMessages(msgs);
+          }
+          setInitialized(true);
+        } else {
+          setMessages(msgs);
+        }
+      } else {
+        // No session exists — FIRST EVER CHAT
+        if (!initialized) {
+          setMessages([DEFAULT_WELCOME_MESSAGE]);
+          setInitialized(true);
+        }
+      }
+
+      setIsLoading(false);
+    } catch (e) {
+      console.log("Error loading latest session:", e);
+      if (!initialized) setMessages([DEFAULT_WELCOME_MESSAGE]);
+      setInitialized(true);
+      setIsLoading(false);
+    }
+  };
+
+  // Load Messages for Session (returns messages)
+  const loadMessages = async (sid, silent = false) => {
+    try {
+      if (!silent) setIsLoading(true);
+
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/chat/session/${sid}/messages`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const formatted = response.data.map((msg) => ({
+        id: msg.id.toString(),
+        text: msg.content,
+        sender: msg.role === "assistant" ? "assistant" : "user",
+        timestamp: msg.created_at,
+      }));
+
+      return formatted;
+    } catch (error) {
+      console.log("Error loading messages:", error);
+      return [];
+    } finally {
+      if (!silent) setIsLoading(false);
+    }
+  };
+
+  // Send Message
+  const sendMessage = async () => {
+    if (!inputText.trim()) return;
+
+    const userTempMessage = {
+      id: Date.now().toString(),
+      text: inputText,
+      sender: "user",
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, userTempMessage]);
+    setInputText("");
+
+    scrollToBottom();
+
+    try {
+      setIsTyping(true);
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await axios.post(
+        `${BASE_URL}/chat/message`,
+        {
+          prompt: userTempMessage.text,
+          session_id: sessionId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const backendMsg = response.data.message;
+
+      const assistantMsg = {
+        id: backendMsg.id.toString(),
+        text: backendMsg.content,
+        sender: "assistant",
+        timestamp: backendMsg.created_at,
+      };
+
+      setMessages((prev) => [...prev, assistantMsg]);
+      setIsTyping(false);
+
+      scrollToBottom();
+
+      if (!sessionId) {
+        setSessionId(response.data.session_id);
+      }
+    } catch (error) {
+      console.log("Error sending message:", error);
+      setIsTyping(false);
+      Alert.alert("Error", "Unable to get response from the assistant.");
+    }
+  };
+
+  // Auto Scroll to Bottom
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
+  // Render Message Bubble
   const renderMessage = ({ item }) => (
-    <View 
+    <View
       style={[
         styles.messageBubble,
-        item.sender === 'user' ? styles.userBubble : styles.assistantBubble
+        item.sender === "user" ? styles.userBubble : styles.assistantBubble,
       ]}
     >
-      <Text style={[
-        styles.messageText,
-        { color: item.sender === 'user' ? '#ffffff' : '#333333' }
-      ]}>
-        {item.text}
-      </Text>
+      <Text style={styles.messageText}>{item.text}</Text>
       <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
     </View>
   );
@@ -218,61 +209,58 @@ const ChatScreen = ({ navigation, route }) => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#3498db" />
-        <Text>Loading your conversation...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+      <View
+        style={{
+          flex: 1,
+          paddingBottom: Platform.OS === "android" ? 6 : 0,
+        }}
       >
-        {/* Chat Messages */}
         <FlatList
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
-          keyExtractor={item => item.id}
-          style={styles.messagesList}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesContainer}
-          onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+          onContentSizeChange={scrollToBottom}
         />
-        
+
         {/* Typing Indicator */}
         {isTyping && (
           <View style={styles.typingIndicator}>
-            <Text style={styles.typingText}>Assistant is typing</Text>
+            <Text style={styles.typingText}>Assistant is typing...</Text>
             <ActivityIndicator size="small" color="#3498db" />
           </View>
         )}
-        
-        {/* Input Area */}
+
+        {/* Input Bar */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
+            placeholder="Type a message..."
+            placeholderTextColor="#999"
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Type your message..."
-            placeholderTextColor="#999"
             multiline
           />
-          <TouchableOpacity 
-            style={styles.sendButton} 
+          <TouchableOpacity
+            style={styles.sendButton}
             onPress={sendMessage}
             disabled={!inputText.trim()}
           >
-            <Ionicons 
-              name="send" 
-              size={24} 
-              color={inputText.trim() ? "#3498db" : "#B0C4DE"} 
+            <Ionicons
+              name="send"
+              size={24}
+              color={inputText.trim() ? "#3498db" : "#ccc"}
             />
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -280,115 +268,80 @@ const ChatScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    height: 60,
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    padding: 5,
-  },
-  archiveButton: {
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#3498db',
-    flex: 1,
-    textAlign: 'center',
+    backgroundColor: "#f8f9fa",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  messagesList: {
-    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   messagesContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 80,
   },
   messageBubble: {
-    maxWidth: '80%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
+    maxWidth: "80%",
+    padding: 12,
+    borderRadius: 16,
     marginVertical: 4,
   },
   userBubble: {
-    backgroundColor: '#3498db',
-    alignSelf: 'flex-end',
+    backgroundColor: "#3498db",
+    alignSelf: "flex-end",
     borderBottomRightRadius: 4,
+    alignItems: "flex-start",
   },
+
   assistantBubble: {
-    backgroundColor: '#e5e5e5',
-    alignSelf: 'flex-start',
+    backgroundColor: "#e5e5e5",
+    alignSelf: "flex-start",
     borderBottomLeftRadius: 4,
+    alignItems: "flex-start",
   },
-  messageText: {
-    fontSize: 16,
-    lineHeight: 22,
+  markdown: {
+    body: {
+      fontSize: 16,
+      color: "#000",
+      flexShrink: 1,
+    },
+    paragraph: {
+      marginBottom: 6,
+      flexShrink: 1,
+    },
   },
-  timestamp: {
-    fontSize: 10,
-    color: '#888888',
-    alignSelf: 'flex-end',
-    marginTop: 4,
-  },
-  typingIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-    marginLeft: 16,
-  },
-  typingText: {
-    fontSize: 12,
-    color: '#666',
-    marginRight: 8,
-  },
+  typingIndicator: { flexDirection: "row", alignItems: "center", padding: 10 },
   inputContainer: {
-    flexDirection: 'row',
-    padding: 12,
-    backgroundColor: '#ffffff',
+    flexDirection: "row",
+    padding: 8,
+    backgroundColor: "#fff",
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    alignItems: 'center',
+    borderTopColor: "#ddd",
+    alignItems: "center",
   },
   input: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 20,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    maxHeight: 100,
+    maxHeight: 120,
   },
   sendButton: {
-    marginLeft: 12,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginLeft: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 12,
-    paddingBottom: Platform.OS === 'ios' ? 25 : 12, // Extra padding for iOS
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    alignItems: 'center',
+  timestamp: {
+    fontSize: 10,
+    color: "#777",
+    marginTop: 4,
+    alignSelf: "flex-end",
+  },
+  typingText: { marginRight: 8, color: "#666" },
+    messageText: {
+    fontSize: 15,
+    color: "#000",
   },
 });
 

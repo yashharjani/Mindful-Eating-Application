@@ -8,7 +8,7 @@ from app import models
 models.Base.metadata.create_all(bind=engine)
 
 # Routes
-from app.routes import user, question, food_update, behavior, goal, tips, big_five
+from app.routes import user, question, food_update, behavior, goal, tips, big_five, chat
 
 # Model preload manager
 from models import llm_manager
@@ -47,7 +47,7 @@ app.include_router(goal.router, prefix="/goal", tags=["Goal"])
 app.include_router(tips.router, prefix="/tips", tags=["Tips"])
 app.include_router(food_update.router, prefix="/food-update", tags=["Food Update"])
 app.include_router(big_five.router, prefix="/big-five", tags=["Big Five Traits"])
-
+app.include_router(chat.router, prefix="", tags=["Chat"])
 
 @app.get("/")
 def root():

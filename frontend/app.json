@@ -24,6 +24,7 @@
       "bundleIdentifier": "com.samshad.mindfuleating"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon-custom.png",
         "backgroundColor": "#ffffff"
