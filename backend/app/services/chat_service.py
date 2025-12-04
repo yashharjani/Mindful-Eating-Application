@@ -181,3 +181,32 @@ def handle_chat_message(db: Session, user: User, prompt: str, session_id: Option
     logger.info(f"[INFO] Final response source: {source}")
 
     return session, assistant_msg
+
+
+def update_message_reaction(db, message_id: int, reaction: str):
+    msg = db.query(ChatMessage).filter(ChatMessage.id == message_id).first()
+    if not msg:
+        return None
+
+    # Toggle logic
+    if reaction == "like":
+        if msg.like:  
+            # User clicked like again → remove reaction
+            msg.like = None
+            msg.dislike = None
+        else:
+            msg.like = True
+            msg.dislike = None
+
+    elif reaction == "dislike":
+        if msg.dislike:
+            # User clicked dislike again → remove reaction
+            msg.like = None
+            msg.dislike = None
+        else:
+            msg.dislike = True
+            msg.like = None
+
+    db.commit()
+    db.refresh(msg)
+    return msg

@@ -114,11 +114,20 @@ const ChatScreen = () => {
         }
       );
 
+      // const formatted = response.data.map((msg) => ({
+      //   id: msg.id.toString(),
+      //   text: msg.content,
+      //   sender: msg.role === "assistant" ? "assistant" : "user",
+      //   timestamp: msg.created_at,
+      // }));
+
       const formatted = response.data.map((msg) => ({
         id: msg.id.toString(),
         text: msg.content,
         sender: msg.role === "assistant" ? "assistant" : "user",
         timestamp: msg.created_at,
+        like: msg.like,
+        dislike: msg.dislike,
       }));
 
       return formatted;
@@ -202,8 +211,77 @@ const ChatScreen = () => {
     >
       <Text style={styles.messageText}>{item.text}</Text>
       <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
+
+      {/* Show reactions only for assistant messages */}
+      {item.sender === "assistant" && (
+        <View style={styles.reactionContainer}>
+          <TouchableOpacity onPress={() => reactToMessage(item.id, "like")}>
+            <Ionicons
+              name={item.like === true ? "thumbs-up" : "thumbs-up-outline"}
+              size={18}
+              color={item.like === true ? "#3498db" : "#777"}
+              style={{ marginRight: 12 }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => reactToMessage(item.id, "dislike")}>
+            <Ionicons
+              name={item.dislike === true ? "thumbs-down" : "thumbs-down-outline"}
+              size={18}
+              color={item.dislike === true ? "red" : "#777"}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
     </View>
   );
+
+  const reactToMessage = async (messageId, reaction) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      await axios.post(
+        `${BASE_URL}/chat/message/react`,
+        {
+          message_id: messageId,
+          reaction,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update UI immediately (including reset case)
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m.id !== messageId.toString()) return m;
+
+          // RESET case → make both null
+          if (
+            (reaction === "like" && m.like === true) ||
+            (reaction === "dislike" && m.dislike === true)
+          ) {
+            return { ...m, like: null, dislike: null };
+          }
+
+          // LIKE
+          if (reaction === "like") {
+            return { ...m, like: true, dislike: null };
+          }
+
+          // DISLIKE
+          if (reaction === "dislike") {
+            return { ...m, dislike: true, like: null };
+          }
+
+          return m;
+        })
+      );
+    } catch (err) {
+      console.log("Reaction error:", err);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -342,6 +420,11 @@ const styles = StyleSheet.create({
     messageText: {
     fontSize: 15,
     color: "#000",
+  },
+  reactionContainer: {
+    flexDirection: "row",
+    marginTop: 6,
+    alignSelf: "flex-start",
   },
 });
 

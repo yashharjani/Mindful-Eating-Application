@@ -72,7 +72,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - "11500:8000"
     command: >
       sh -c "alembic upgrade head &&
              uvicorn main:app --host 0.0.0.0 --port 8000"

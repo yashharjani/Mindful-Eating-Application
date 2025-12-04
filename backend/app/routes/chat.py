@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.utils.auth import get_current_user
 from app.schemas.chat import ChatRequest, ChatResponse, ChatMessageOut, ChatSessionOut
-from app.controllers.chat_controller import process_chat_message
+from app.controllers.chat_controller import process_chat_message, process_reaction
 from app.models.chat import ChatSession, ChatMessage
 
 router = APIRouter()
@@ -55,3 +55,21 @@ def get_session_messages(
         .all()
     )
     return msgs
+
+@router.post("/chat/message/react", response_model=ChatMessageOut)
+def react_to_message(
+    payload: dict,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    message_id = payload.get("message_id")
+    reaction = payload.get("reaction")
+
+    if reaction not in ["like", "dislike", "reset"]:
+        raise HTTPException(status_code=400, detail="Invalid reaction")
+
+    updated = process_reaction(message_id, reaction, db, user)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Message not found or unauthorized")
+
+    return ChatMessageOut.from_orm(updated)

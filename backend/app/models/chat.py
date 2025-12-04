@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column
 from app.database import Base
 from app.utils.get_current_time import get_current_time
 
@@ -27,5 +28,8 @@ class ChatMessage(Base):
     content = Column(String, nullable=False)
     source = Column(String, nullable=True)  # "db", "navigation", "openai"
     created_at = Column(DateTime, default=get_current_time())
+
+    like = Column(Boolean, nullable=True)
+    dislike = Column(Boolean, nullable=True)
 
     session = relationship("ChatSession", back_populates="messages")
