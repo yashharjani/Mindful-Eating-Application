@@ -2,6 +2,7 @@
   "expo": {
     "name": "MindfulEating",
     "slug": "MindfulEating",
+    "owner": "yashharjani",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon-custom.png",
@@ -14,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.yash.mindfuleating",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile pictures.",
         "NSCameraUsageDescription": "This app needs access to your camera to take profile pictures.",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         }
-      },
-      "bundleIdentifier": "com.samshad.mindfuleating"
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
@@ -35,7 +36,7 @@
         "INTERNET",
         "ACCESS_NETWORK_STATE"
       ],
-      "package": "com.samshad.mindfuleating",
+      "package": "com.yash.mindfuleating",
       "allowInsecureHttpRequests": true,
       "versionCode": 1,
       "networkSecurityConfig": "./assets/network_security_config.xml",
@@ -65,7 +66,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "f40113b3-f7fd-449e-aa7f-c2e7239cf48e"
+        "projectId": "c4b776b9-1391-4719-8c8b-926a3e7d06b3"
       }
     },
     "plugins": [
